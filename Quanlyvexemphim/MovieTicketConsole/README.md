@@ -1,4 +1,4 @@
-﻿# CHƯƠNG TRÌNH QUẢN LÝ VÉ XEM PHIM
+# CHƯƠNG TRÌNH QUẢN LÝ VÉ XEM PHIM
 Dự án môn học lập trình C# Console — UEH 2025  
 ---
 ## Giới thiệu
@@ -26,12 +26,15 @@ Chương trình đáp ứng các tiêu chí kỹ thuật của môn học:
 | 7   | Sắp xếp danh sách khách (A → Z) | Sắp xếp danh sách khách theo tên bằng thuật toán Bubble Sort                                  |
 | 8   | Sửa vé khách hàng               | Cập nhật thông tin khách hoặc vị trí ghế đã đặt                                               |
 | 0   | Thoát chương trình              | Lưu dữ liệu, kết thúc an toàn |
+
 ---
 ## Cấu trúc chương trình
+
 MovieTicketConsole/
 ┣ Dependencies/ # Thư viện bên ngoài
 ┣ Program.cs # Chứa hàm Main menu chính và các hàm
 ┗ README.md # Tài liệu mô tả chương trình
+
 ---
 ## Thuật toán và kỹ thuật sử dụng
 ### Mảng
@@ -86,6 +89,7 @@ MovieTicketConsole/
         ┌────────────────┐
         │    KẾT THÚC    │
         └────────────────┘
+
 ---
 ## Hướng dẫn sử dụng
 1. Tải dự án từ file hoặc Github.
