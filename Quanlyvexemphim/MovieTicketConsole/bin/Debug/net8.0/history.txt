@@ -1,0 +1,36 @@
+[09/Oct/2025 11:12:19 PM] ĐẶT VÉ: NT - Ghế (1,1) - Giá 50000 VND
+[09/Oct/2025 11:53:37 PM] ĐẶT VÉ: An (1234) - Ghế (2,2) - Giá 50,000 VND
+[09/Oct/2025 11:54:06 PM] ĐẶT VÉ: 3 (1235) - Ghế (3,4) - Giá 50,000 VND
+[09/Oct/2025 11:54:43 PM] ĐẶT VÉ: Hùng (1236) - Ghế (6,4) - Giá 50,000 VND
+[09/Oct/2025 11:54:55 PM] HỦY VÉ: Ghế (3,4) - Khách: 3 (1235)
+[09/Oct/2025 11:56:15 PM] ĐẶT VÉ: Anh (1233) - Ghế (2,3) - Giá 50,000 VND
+[09/Oct/2025 11:56:21 PM] ĐẶT VÉ: Anh (1233) - Ghế (2,4) - Giá 50,000 VND
+[09/Oct/2025 11:57:25 PM] ĐẶT VÉ: Linh (2000) - Ghế (7,1) - Giá 50,000 VND
+[09/Oct/2025 11:57:29 PM] ĐẶT VÉ: Linh (2000) - Ghế (7,2) - Giá 50,000 VND
+[09/Oct/2025 11:57:31 PM] ĐẶT VÉ: Linh (2000) - Ghế (7,3) - Giá 50,000 VND
+[09/Oct/2025 11:57:32 PM] ĐẶT VÉ: Linh (2000) - Ghế (7,4) - Giá 50,000 VND
+[09/Oct/2025 11:57:34 PM] ĐẶT VÉ: Linh (2000) - Ghế (7,5) - Giá 50,000 VND
+[09/Oct/2025 11:57:36 PM] ĐẶT VÉ: Linh (2000) - Ghế (7,6) - Giá 50,000 VND
+[09/Oct/2025 11:57:38 PM] ĐẶT VÉ: Linh (2000) - Ghế (7,7) - Giá 50,000 VND
+[09/Oct/2025 11:57:41 PM] ĐẶT VÉ: Linh (2000) - Ghế (7,8) - Giá 50,000 VND
+[09/Oct/2025 11:57:44 PM] ĐẶT VÉ: Linh (2000) - Ghế (7,9) - Giá 50,000 VND
+[09/Oct/2025 11:57:46 PM] ĐẶT VÉ: Linh (2000) - Ghế (7,10) - Giá 50,000 VND
+[10/Oct/2025 12:18:29 AM] SỬA VÉ: An (1234) -> H2, C2
+[10/Oct/2025 12:18:53 AM] SỬA VÉ: An (1234) -> H1, C3
+[10/Oct/2025 12:20:43 AM] SỬA VÉ: An (1234) -> H5, C8
+[10/Oct/2025 12:22:26 AM] SỬA VÉ: An (1234) -> H5, C8
+[10/Oct/2025 12:47:58 AM] HỦY VÉ: Ghế (2,3) - Khách: Anh (1233)
+[10/Oct/2025 12:48:07 AM] HỦY VÉ: Ghế (2,4) - Khách: Anh (1233)
+[10/Oct/2025 12:48:44 AM] ĐẶT VÉ: Thuong (3625) - Ghế (2,3) - Giá 50,000 VND
+[10/Oct/2025 12:48:57 AM] HỦY VÉ: Ghế (2,3) - Khách: Thuong (3625)
+[10/Oct/2025 12:50:14 AM] ĐẶT VÉ: Thuong (3625) - Ghế (7,11) - Giá 50,000 VND
+[10/Oct/2025 12:50:18 AM] ĐẶT VÉ: Thuong (3625) - Ghế (7,12) - Giá 50,000 VND
+[10/Oct/2025 12:53:19 AM] SỬA VÉ: Thuong (3625) -> H7, C12
+[10/Oct/2025 3:52:04 PM] ĐẶT VÉ: Thuong (1238) - Ghế (C, 7) - Giá 50,000 VND
+[10/Oct/2025 3:52:17 PM] HỦY VÉ: Ghế (3,7) - Khách: Thuong (1238)
+[25/Oct/2025 11:11:29 PM] ĐẶT VÉ: Nguyen Thi Hoai Thuong (3625) - Ghế (A, 5) - Giá 50,000 VND
+[25/Oct/2025 11:11:39 PM] ĐẶT VÉ: Nguyen Thi Hoai Thuong (3625) - Ghế (A, 6) - Giá 50,000 VND
+[25/Oct/2025 11:11:42 PM] ĐẶT VÉ: Nguyen Thi Hoai Thuong (3625) - Ghế (A, 7) - Giá 50,000 VND
+[25/Oct/2025 11:11:59 PM] HỦY VÉ: Nguyen Thi Hoai Thuong (3625) Ghế (A, 6)
+[25/Oct/2025 11:12:11 PM] HỦY VÉ: Nguyen Thi Hoai Thuong (3625) Ghế (A, 7)
+[25/Oct/2025 11:13:46 PM] SỬA VÉ: Nguyen Thi Hoai Thuong (3625) -> (F, 10)

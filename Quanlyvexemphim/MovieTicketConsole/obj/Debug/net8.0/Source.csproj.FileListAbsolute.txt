@@ -1,0 +1,14 @@
+D:\New folder\Std\Cơ sở lập trình\Quanlyvexemphim\Source\obj\Debug\net8.0\Source.GeneratedMSBuildEditorConfig.editorconfig
+D:\New folder\Std\Cơ sở lập trình\Quanlyvexemphim\Source\obj\Debug\net8.0\Source.AssemblyInfoInputs.cache
+D:\New folder\Std\Cơ sở lập trình\Quanlyvexemphim\Source\obj\Debug\net8.0\Source.AssemblyInfo.cs
+D:\New folder\Std\Cơ sở lập trình\Quanlyvexemphim\Source\obj\Debug\net8.0\Source.csproj.CoreCompileInputs.cache
+D:\New folder\Std\Cơ sở lập trình\Quanlyvexemphim\Source\bin\Debug\net8.0\Source.exe
+D:\New folder\Std\Cơ sở lập trình\Quanlyvexemphim\Source\bin\Debug\net8.0\Source.deps.json
+D:\New folder\Std\Cơ sở lập trình\Quanlyvexemphim\Source\bin\Debug\net8.0\Source.runtimeconfig.json
+D:\New folder\Std\Cơ sở lập trình\Quanlyvexemphim\Source\bin\Debug\net8.0\Source.dll
+D:\New folder\Std\Cơ sở lập trình\Quanlyvexemphim\Source\bin\Debug\net8.0\Source.pdb
+D:\New folder\Std\Cơ sở lập trình\Quanlyvexemphim\Source\obj\Debug\net8.0\Source.dll
+D:\New folder\Std\Cơ sở lập trình\Quanlyvexemphim\Source\obj\Debug\net8.0\refint\Source.dll
+D:\New folder\Std\Cơ sở lập trình\Quanlyvexemphim\Source\obj\Debug\net8.0\Source.pdb
+D:\New folder\Std\Cơ sở lập trình\Quanlyvexemphim\Source\obj\Debug\net8.0\Source.genruntimeconfig.cache
+D:\New folder\Std\Cơ sở lập trình\Quanlyvexemphim\Source\obj\Debug\net8.0\ref\Source.dll
