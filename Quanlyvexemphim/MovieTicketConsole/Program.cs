@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
+using System.Text;
+using System.Globalization;
 
 namespace CinemaTicket
 {
@@ -33,7 +35,8 @@ namespace CinemaTicket
 
         static void Main(string[] args)
         {
-            Console.OutputEncoding = System.Text.Encoding.UTF8;
+            Console.OutputEncoding = Encoding.Unicode;
+            Console.InputEncoding = Encoding.Unicode;
             LoadCustomers();
             ShowWelcome();
 
@@ -134,7 +137,7 @@ namespace CinemaTicket
         static void ShowMenu() //Giao diện menu
         {
             Console.Clear();
-            DrawHeader("🎟️  MENU QUẢN LÝ VÉ RẠP  🎟️"); // Vẽ tiêu đề menu
+            DrawHeader("MENU QUẢN LÝ VÉ RẠP"); // Vẽ tiêu đề menu
             Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine("1. Hiển thị sơ đồ ghế");
             Console.ForegroundColor = ConsoleColor.Green;
@@ -193,66 +196,134 @@ namespace CinemaTicket
             }
 
             Console.WriteLine("\nChú thích: ☐ = Ghế trống, ☒ = Ghế đã đặt");
-            if (wait) WaitAndClear(); //sử dụng bool
+            if (wait) WaitAndClear();
         }
-        static void ShowSeatsOnly() //khác ở hàm trên là không chờ
+        static void ShowSeatsOnly()
         {
             ShowSeats(false);
         }
 
 
         // ====== ĐẶT VÉ ======
+        // ====== ĐÃ SỬA LẠI HÀM NÀY ======
         static void BookTicket()
         {
             ShowSeatsOnly();
             Console.WriteLine("\n=== ĐẶT VÉ ===");
 
-            Console.Write("Bạn đã đặt vé online chưa? (Nếu có, nhập 'y', nếu chưa nhập 'n'): ");
+            // [VALIDATION QUAN TRỌNG - SỐ 4] Tính số ghế còn trống
+            int emptySeats = (ROWS * COLS) - soldSeats;
 
-            string online = Console.ReadLine().ToLower(); //chuyển về chữ thường để dễ so sánh
+            // Nếu rạp đã đầy thì báo luôn, khỏi cần nhập thông tin gì nữa
+            if (emptySeats == 0)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("\n❌ Rạp đã hết sạch vé! Không thể đặt thêm.");
+                Console.ResetColor();
+                WaitAndClear();
+                return;
+            }
+
+            Console.Write("Bạn đã đặt vé online chưa? (y/n): ");
+            string online = Console.ReadLine().ToLower();
 
             if (online == "y")
             {
                 Console.ForegroundColor = ConsoleColor.Cyan;
-                Console.WriteLine("→ Xác nhận: Khách hàng đã đặt vé online từ trước. Vui lòng nhập thông tin để nhận ghế.");
+                Console.WriteLine("→ Xác nhận: Khách hàng online. Vui lòng chọn ghế.");
                 Console.ResetColor();
 
-                Console.Write("Số lượng vé: ");
-                if (!int.TryParse(Console.ReadLine(), out int soVe))
+                // [SỬA LỖI SỐ 4] Kiểm tra số lượng vé hợp lệ với số ghế trống
+                Console.Write($"Số lượng vé (còn {emptySeats} chỗ): ");
+                if (!int.TryParse(Console.ReadLine(), out int soVe) || soVe <= 0)
                 {
-                    Console.WriteLine("Sai dữ liệu!"); return;
+                    Console.WriteLine("❌ Số lượng phải là số dương!"); return;
+                }
+
+                if (soVe > emptySeats)
+                {
+                    Console.WriteLine($"❌ Chỉ còn lại {emptySeats} ghế trống. Không thể đặt {soVe} vé!");
+                    WaitAndClear();
+                    return;
                 }
 
                 for (int i = 0; i < soVe; i++)
                 {
-                    Console.WriteLine($"Vé thứ {i + 1}:");
-                    BookSingleTicket(); // GỌI HÀM NẠP CHỒNG
+                    Console.WriteLine($"\n>> Vé thứ {i + 1}:");
+                    BookSingleTicket();
                 }
             }
             else
             {
-                Console.Write("Nhập tên khách: ");
-                string name = Console.ReadLine();
-                Console.Write("Nhập 4 số cuối điện thoại: ");
-                string phoneLast4 = Console.ReadLine();
-
-                if (phoneLast4.Length != 4 || !int.TryParse(phoneLast4, out _))
+                // [SỬA LỖI NHẬP TÊN] Xóa dòng ReadLine thừa ở ngoài, chỉ để trong vòng lặp
+                string name;
+                while (true)
                 {
-                    Console.WriteLine("❌ Vui lòng nhập đúng 4 chữ số!");
+                    Console.Write("Nhập tên khách: ");
+                    name = Console.ReadLine()?.Trim();
+
+                    if (string.IsNullOrEmpty(name))
+                    {
+                        Console.WriteLine("❌ Tên không được để trống!");
+                    }
+                    else if (name.Contains("|"))
+                    {
+                        Console.WriteLine("❌ Tên không được chứa ký tự '|'!");
+                    }
+                    else
+                    {
+                        break; // Tên hợp lệ, thoát vòng lặp
+                    }
+                }
+
+                // [SỬA LỖI NHẬP SĐT] Xóa dòng ReadLine thừa ở ngoài
+                string phoneLast4;
+                while (true)
+                {
+                    Console.Write("Nhập 4 số cuối điện thoại: ");
+                    phoneLast4 = Console.ReadLine();
+
+                    // Check độ dài và check từng ký tự có phải là số không
+                    bool isAllDigits = true;
+                    foreach (char c in phoneLast4)
+                    {
+                        if (!char.IsDigit(c))
+                        {
+                            isAllDigits = false;
+                            break;
+                        }
+                    }
+
+                    if (phoneLast4.Length == 4 && isAllDigits)
+                    {
+                        break; // Hợp lệ, thoát vòng lặp
+                    }
+                    Console.WriteLine("❌ Vui lòng nhập đúng 4 chữ số (0-9)!");
+                }
+
+                // [UPDATE] Đồng nhất hiển thị tiền tệ
+                Console.WriteLine("Giá vé: {0:N0} VND", TICKET_PRICE);
+
+                // [SỬA LỖI SỐ 4] Kiểm tra số lượng vé hợp lệ với số ghế trống
+                Console.Write($"Số lượng vé (còn {emptySeats} chỗ): ");
+                if (!int.TryParse(Console.ReadLine(), out int soVe) || soVe <= 0)
+                {
+                    Console.WriteLine("❌ Số lượng phải là số dương!");
+                    WaitAndClear();
                     return;
                 }
 
-                Console.WriteLine("Giá vé: {0} VND", TICKET_PRICE);
-                Console.Write("Số lượng vé: ");
-                if (!int.TryParse(Console.ReadLine(), out int soVe))
+                if (soVe > emptySeats)
                 {
-                    Console.WriteLine("Sai dữ liệu!"); return;
+                    Console.WriteLine($"❌ Chỉ còn lại {emptySeats} ghế trống. Không thể đặt {soVe} vé!");
+                    WaitAndClear();
+                    return;
                 }
 
                 for (int i = 0; i < soVe; i++)
                 {
-                    Console.WriteLine($"Vé thứ {i + 1}:");
-                    BookSingleTicket(name, phoneLast4); // GỌI HÀM GỐC (có tên)
+                    Console.WriteLine($"\n>> Vé thứ {i + 1}:");
+                    BookSingleTicket(name, phoneLast4);
                 }
             }
 
@@ -260,52 +331,53 @@ namespace CinemaTicket
         }
 
 
+
         static void BookSingleTicket(string name, string phoneLast4)
         {
             Console.Write("Nhập hàng ghế (A-{0}): ", GetRowLetter(ROWS - 1));
-            string rowInput = Console.ReadLine().ToUpper();
-            int row = GetRowIndexFromLetter(rowInput);
+            string rowInput = Console.ReadLine();
+
+            if (string.IsNullOrEmpty(rowInput))
+            {
+                Console.WriteLine("❌ Vui lòng nhập ký tự hàng ghế!");
+                return;
+            }
+
+            int row = GetRowIndexFromLetter(rowInput); // Hàm này đã có sẵn logic xử lý chữ hoa/thường
+
             if (row < 0 || row >= ROWS)
             {
-                Console.WriteLine("Hàng không hợp lệ!");
+                Console.WriteLine("❌ Hàng không hợp lệ!");
                 return;
             }
 
             Console.Write("Nhập số cột (1-{0}): ", COLS);
-            if (!int.TryParse(Console.ReadLine(), out int col))
+            if (!int.TryParse(Console.ReadLine(), out int col) || col < 1 || col > COLS)
             {
-                Console.WriteLine("Sai dữ liệu!");
+                Console.WriteLine("❌ Cột không hợp lệ!");
                 return;
             }
-            col--;
+            col--; // Chuyển về index 0-based
 
-            if (row < 0 || row >= ROWS || col < 0 || col >= COLS)
-            {
-                Console.WriteLine("Ghế không hợp lệ!");
-                return;
-            }
-            // Kiểm tra trùng thông tin khách trước
+            // Kiểm tra trùng thông tin khách
             if (customers.Exists(c =>
                 c.Name.Equals(name, StringComparison.OrdinalIgnoreCase) &&
                 c.PhoneLast4 == phoneLast4 &&
                 c.Row == row + 1 && c.Col == col + 1))
             {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine($"❌ Khách {name} ({phoneLast4}) đã đặt ghế ({row + 1},{col + 1}) rồi!");
-                Console.ResetColor();
+                Console.WriteLine($"❌ Khách {name} ({phoneLast4}) đã đặt ghế {GetRowLetter(row)}{col + 1} rồi!");
                 return;
             }
 
-            // Sau đó mới kiểm tra ghế có người khác đặt chưa
             if (seats[row, col] == SeatStatus.Booked)
             {
                 Console.WriteLine("❌ Ghế đã có người khác đặt!");
                 return;
             }
+
             seats[row, col] = SeatStatus.Booked;
-            soldSeats++; // Tăng số ghế đã bán
-            revenue += TICKET_PRICE; // Cộng doanh thu
-            // Thêm khách hàng vào danh sách
+            soldSeats++;
+            revenue += TICKET_PRICE;
 
             Customer c = new Customer
             {
@@ -314,19 +386,19 @@ namespace CinemaTicket
                 Row = row + 1,
                 Col = col + 1,
                 Price = TICKET_PRICE
-            }; // Tạo struct Customer
-            customers.Add(c); // Thêm khách hàng vào danh sách dựa vào struct Customer
+            };
+            customers.Add(c);
 
-            Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine($">> Đặt vé thành công cho {name} tại ghế ({GetRowLetter(row)}, {col + 1})");
+            // ĐỒNG NHẤT FORMAT HIỂN THỊ
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine($"✅ Đặt vé thành công: {name} - Ghế {GetRowLetter(row)}{col + 1}");
             Console.ResetColor();
 
+            // ĐỒNG NHẤT FORMAT LOG FILE (A1, B2...)
             File.AppendAllText("history.txt",
-            $"[{DateTime.Now}] ĐẶT VÉ: {name} ({phoneLast4}) - Ghế ({GetRowLetter(row)}, {col + 1}) - Giá {c.Price:N0} VND\n");
+            $"[{DateTime.Now}] ĐẶT VÉ: {name} ({phoneLast4}) - Ghế {GetRowLetter(row)}{col + 1} - Giá {c.Price:N0} VND\n");
 
-            // Ghi vào lịch sử
-
-            SaveCustomers(); // Lưu khách hàng sau khi đặt vé
+            SaveCustomers();
         }
 
         // ====== HÀM NẠP CHỒNG: ĐẶT VÉ TỪ APP VÉ ONLINE ======
@@ -339,46 +411,37 @@ namespace CinemaTicket
         // ====== HỦY VÉ ======
         static void CancelTicket()
         {
-            ShowSeatsOnly(); // Hiển thị sơ đồ ghế không chờ
-            Console.WriteLine("\n=== HỦY VÉ ==="); // Tiêu đề hủy vé
+            ShowSeatsOnly();
+            Console.WriteLine("\n=== HỦY VÉ ===");
 
             Console.Write("Nhập hàng ghế (A-{0}): ", GetRowLetter(ROWS - 1));
             string rowInput = Console.ReadLine().ToUpper();
             int row = GetRowIndexFromLetter(rowInput);
-            if (row < 0 || row >= ROWS)
-            {
-                Console.WriteLine("Hàng không hợp lệ!");
-                return;
-            }
+            if (row < 0 || row >= ROWS) { Console.WriteLine("❌ Hàng không hợp lệ!"); return; }
 
             Console.Write("Nhập số cột (1-{0}): ", COLS);
-            if (!int.TryParse(Console.ReadLine(), out int col))
-            {
-                Console.WriteLine("Sai dữ liệu!");
-                return;
-            }
+            if (!int.TryParse(Console.ReadLine(), out int col) || col < 1 || col > COLS) { Console.WriteLine("❌ Sai dữ liệu!"); return; }
             col--;
 
-            int index = customers.FindIndex(c => c.Row == row + 1 && c.Col == col + 1); // Tìm khách hàng theo ghế
+            int index = customers.FindIndex(c => c.Row == row + 1 && c.Col == col + 1);
             if (index == -1)
             {
-                Console.WriteLine($"Không tìm thấy vé tại ghế ({GetRowLetter(row)}, {col + 1})!");
+                Console.WriteLine($"❌ Không tìm thấy vé tại ghế {GetRowLetter(row)}{col + 1}!");
                 return;
             }
 
-            var customer = customers[index]; // Lấy thông tin khách hàng
-            seats[row, col] = SeatStatus.Empty; // Đánh dấu ghế trống lại
-            soldSeats--; // Giảm số ghế đã bán
-            revenue -= customer.Price; // Giảm doanh thu
-            customers.RemoveAt(index); // Xóa khách hàng khỏi danh sách
+            var customer = customers[index];
+            seats[row, col] = SeatStatus.Empty;
+            soldSeats--;
+            revenue -= customer.Price;
+            customers.RemoveAt(index);
 
-            Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine($">> Hủy vé thành công cho ghế ({GetRowLetter(row)}, {col + 1}).");
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine($"✅ Hủy vé thành công cho ghế {GetRowLetter(row)}{col + 1}.");
             Console.ResetColor();
 
             File.AppendAllText("history.txt",
-            $"[{DateTime.Now}] HỦY VÉ: {customers[index].Name} ({customers[index].PhoneLast4}) Ghế ({GetRowLetter(customers[index].Row - 1)}, {customers[index].Col})\n");
-
+            $"[{DateTime.Now}] HỦY VÉ: {customer.Name} ({customer.PhoneLast4}) - Ghế {GetRowLetter(customer.Row - 1)}{customer.Col}\n");
 
             SaveCustomers();
             WaitAndClear();
@@ -394,40 +457,42 @@ namespace CinemaTicket
             Console.Write("Nhập 4 số cuối điện thoại: ");
             string phoneLast4 = Console.ReadLine();
 
-            // Tìm vé theo tên + số điện thoại
             var matches = customers.FindAll(c =>
                 c.Name.Equals(name, StringComparison.OrdinalIgnoreCase) && c.PhoneLast4 == phoneLast4);
 
             if (matches.Count == 0)
             {
-                Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("❌ Không tìm thấy vé khớp với thông tin trên!");
-                Console.ResetColor();
                 WaitAndClear();
                 return;
             }
 
-            // Nếu có nhiều vé cùng tên/số, cho người dùng chọn vé cần sửa
             Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine($"\n>> Tìm thấy {matches.Count} vé:");
             for (int i = 0; i < matches.Count; i++)
             {
-                Console.WriteLine($"{i + 1}. Ghế H{matches[i].Row}, C{matches[i].Col} - Giá {matches[i].Price:N0} VND");
+                string rowLetter = GetRowLetter(matches[i].Row - 1);
+                Console.WriteLine($"{i + 1}. Ghế {rowLetter}{matches[i].Col} - Giá {matches[i].Price:N0} VND");
             }
             Console.ResetColor();
 
             Console.Write("\nChọn vé cần sửa (nhập số thứ tự): ");
             if (!int.TryParse(Console.ReadLine(), out int choice) || choice < 1 || choice > matches.Count)
             {
-                Console.WriteLine("Lựa chọn không hợp lệ!");
+                Console.WriteLine("❌ Lựa chọn không hợp lệ!");
                 WaitAndClear();
                 return;
             }
 
-            Customer oldTicket = matches[choice - 1];
-            int index = customers.FindIndex(c => c.Row == oldTicket.Row && c.Col == oldTicket.Col && c.PhoneLast4 == oldTicket.PhoneLast4);
+            // Lấy tham chiếu đến đối tượng trong list gốc
+            Customer targetTicket = matches[choice - 1];
+            int index = customers.IndexOf(targetTicket); // Lấy index chính xác trong list gốc
 
-            // Hỏi người dùng muốn đổi gì
+            // LƯU LẠI THÔNG TIN CŨ RA BIẾN RIÊNG (để tránh bị thay đổi theo tham chiếu)
+            string oldSeatName = $"{GetRowLetter(targetTicket.Row - 1)}{targetTicket.Col}";
+            string oldName = targetTicket.Name;
+            string oldPhone = targetTicket.PhoneLast4;
+
             Console.WriteLine("\nBạn muốn sửa gì?");
             Console.WriteLine("1. Đổi ghế");
             Console.WriteLine("2. Đổi tên khách");
@@ -436,75 +501,69 @@ namespace CinemaTicket
             Console.Write("Lựa chọn: ");
             string option = Console.ReadLine();
 
+            string logDetail = ""; // Biến để ghi log
+
             switch (option)
             {
                 case "1":
                     ShowSeatsOnly();
                     Console.Write("Nhập hàng ghế mới (A-{0}): ", GetRowLetter(ROWS - 1));
                     string rowInput = Console.ReadLine().ToUpper();
-                    int newRow = GetRowIndexFromLetter(rowInput) + 1; // +1 vì dữ liệu khách lưu là 1-based
-                    if (newRow < 1 || newRow > ROWS)
-                    {
-                        Console.WriteLine("Hàng không hợp lệ!");
-                        return;
-                    }
+                    int newRow = GetRowIndexFromLetter(rowInput) + 1; // 1-based
 
+                    if (newRow < 1 || newRow > ROWS) { Console.WriteLine("❌ Hàng không hợp lệ!"); return; }
 
                     Console.Write("Nhập cột ghế mới (1-{0}): ", COLS);
-                    if (!int.TryParse(Console.ReadLine(), out int newCol) || newCol < 1 || newCol > COLS)
+                    if (!int.TryParse(Console.ReadLine(), out int newCol) || newCol < 1 || newCol > COLS) { Console.WriteLine("❌ Cột không hợp lệ!"); return; }
+
+                    // Check trùng ghế (trừ khi chọn lại đúng ghế cũ)
+                    // Kiểm tra trùng ghế: Nếu ghế đã đặt VÀ KHÔNG PHẢI là ghế hiện tại của khách đó
+                    if (seats[newRow - 1, newCol - 1] == SeatStatus.Booked &&
+                    (newRow != targetTicket.Row || newCol != targetTicket.Col))
                     {
-                        Console.WriteLine("Cột không hợp lệ!");
+                        Console.WriteLine("❌ Ghế này đã có người khác đặt!");
                         return;
                     }
 
-                    if (seats[newRow - 1, newCol - 1] == SeatStatus.Booked)
-                    {
-                        Console.WriteLine("❌ Ghế này đã có người đặt!");
-                        return;
-                    }
-
-                    seats[oldTicket.Row - 1, oldTicket.Col - 1] = SeatStatus.Empty;
+                    // Update ghế trên sơ đồ
+                    seats[targetTicket.Row - 1, targetTicket.Col - 1] = SeatStatus.Empty;
                     seats[newRow - 1, newCol - 1] = SeatStatus.Booked;
+
+                    // Update thông tin khách
                     customers[index].Row = newRow;
                     customers[index].Col = newCol;
 
-                    Console.ForegroundColor = ConsoleColor.Green;
-                    Console.WriteLine($"✅ Đã đổi sang ghế H{newRow}, C{newCol} thành công!");
-                    Console.ResetColor();
+                    string newSeatName = $"{GetRowLetter(newRow - 1)}{newCol}";
+                    Console.WriteLine($"✅ Đã đổi từ ghế {oldSeatName} sang {newSeatName} thành công!");
+                    logDetail = $"Đổi ghế: {oldSeatName} -> {newSeatName}";
                     break;
 
                 case "2":
                     Console.Write("Nhập tên mới: ");
                     string newName = Console.ReadLine();
                     customers[index].Name = newName;
-                    Console.ForegroundColor = ConsoleColor.Green;
-                    Console.WriteLine($"✅ Đã cập nhật tên thành: {newName}");
-                    Console.ResetColor();
+                    Console.WriteLine($"✅ Đã cập nhật tên: {oldName} -> {newName}");
+                    logDetail = $"Đổi tên: {oldName} -> {newName}";
                     break;
 
                 case "3":
                     Console.Write("Nhập 4 số điện thoại mới: ");
                     string newPhone = Console.ReadLine();
-                    if (newPhone.Length != 4 || !int.TryParse(newPhone, out _))
-                    {
-                        Console.WriteLine("❌ Phải nhập đúng 4 chữ số!");
-                        return;
-                    }
+                    if (newPhone.Length != 4 || !int.TryParse(newPhone, out _)) { Console.WriteLine("❌ Phải nhập 4 chữ số!"); return; }
                     customers[index].PhoneLast4 = newPhone;
-                    Console.ForegroundColor = ConsoleColor.Green;
-                    Console.WriteLine($"✅ Đã cập nhật số điện thoại thành: {newPhone}");
-                    Console.ResetColor();
+                    Console.WriteLine($"✅ Đã cập nhật SĐT: {oldPhone} -> {newPhone}");
+                    logDetail = $"Đổi SĐT: {oldPhone} -> {newPhone}";
                     break;
 
                 default:
-                    Console.WriteLine("Đã hủy thao tác sửa vé.");
-                    break;
+                    Console.WriteLine("Đã hủy thao tác.");
+                    WaitAndClear();
+                    return;
             }
 
-            // Ghi vào lịch sử
+            // Ghi log lịch sử chuẩn xác
             File.AppendAllText("history.txt",
-            $"[{DateTime.Now}] SỬA VÉ: {oldTicket.Name} ({oldTicket.PhoneLast4}) -> ({GetRowLetter(customers[index].Row - 1)}, {customers[index].Col})\n");
-
+            $"[{DateTime.Now}] SỬA VÉ: {oldName} ({oldPhone}) - {logDetail}\n");
 
             SaveCustomers();
             WaitAndClear();
@@ -530,6 +589,7 @@ namespace CinemaTicket
         static void SearchTicketByName()
         {
             Console.Clear();
+            Console.OutputEncoding = System.Text.Encoding.UTF8;
             DrawHeader("TÌM KIẾM VÉ THEO TÊN KHÁCH");
             Console.Write("\nNhập tên khách cần tìm: ");
             string searchName = Console.ReadLine();
@@ -537,7 +597,7 @@ namespace CinemaTicket
             var matches = customers.FindAll(c => c.Name.Equals(searchName, StringComparison.OrdinalIgnoreCase));
             if (matches.Count == 0)
             {
-                Console.WriteLine("\nKhông tìm thấy khách hàng này!");
+                Console.WriteLine("\n❌ Không tìm thấy khách hàng này!");
             }
             else
             {
@@ -546,10 +606,11 @@ namespace CinemaTicket
                 Console.ResetColor();
                 foreach (var r in matches)
                 {
-                    Console.WriteLine($"- {r.Name} | {r.PhoneLast4} | Ghế: H{r.Row}, C{r.Col} | {r.Price} VND");
+                    // Đồng nhất hiển thị dạng A1
+                    string seatCode = $"{GetRowLetter(r.Row - 1)}{r.Col}";
+                    Console.WriteLine($"- {r.Name,-20} | {r.PhoneLast4} | Ghế: {seatCode,-4} | {r.Price:N0} VND");
                 }
             }
-
             WaitAndClear();
         }
 
@@ -626,7 +687,7 @@ namespace CinemaTicket
         }
 
         // ====== HIỂN THỊ GHẾ KHÔNG CHỜ ======
-        
+
 
         // ====== LƯU / NẠP KHÁCH ======
         static void SaveCustomers()
@@ -650,7 +711,7 @@ namespace CinemaTicket
         }
 
 
-        static void LoadCustomers() // Nạp khách từ file
+        static void LoadCustomers()
         {
             try
             {
@@ -674,35 +735,28 @@ namespace CinemaTicket
                     if (!int.TryParse(parts[3], out int col)) continue;
                     if (!double.TryParse(parts[4], out double price)) continue;
 
-                    Customer c = new Customer
-                    {
-                        Name = name,
-                        PhoneLast4 = phone,
-                        Row = row,
-                        Col = col,
-                        Price = price
-                    };
-                    customers.Add(c);
-
-                    // bảo đảm chỉ đánh dấu ghế khi số hàng/cột hợp lệ
+                    // KIỂM TRA HỢP LỆ TRƯỚC KHI THÊM
                     if (row - 1 >= 0 && row - 1 < ROWS && col - 1 >= 0 && col - 1 < COLS)
                     {
+                        Customer c = new Customer
+                        {
+                            Name = name,
+                            PhoneLast4 = phone,
+                            Row = row,
+                            Col = col,
+                            Price = price
+                        };
+                        customers.Add(c);
+
                         seats[row - 1, col - 1] = SeatStatus.Booked;
                         soldSeats++;
                         revenue += c.Price;
                     }
-                    else
-                    {
-                        // Nếu dữ liệu sai (ghế vượt quá rạp),
-                        Console.WriteLine($"Bỏ qua bản ghi không hợp lệ: {line}");
-                    }
-
                 }
             }
             catch (Exception ex)
             {
                 Console.WriteLine("Lỗi khi nạp dữ liệu: " + ex.Message);
-                // không throw tiếp, để chương trình vẫn chạy
             }
         }
 
@@ -713,6 +767,19 @@ namespace CinemaTicket
             Console.ReadLine();
             SmoothClear();
         }
+        static string GetFirstName(string fullName)
+        {
+            if (string.IsNullOrWhiteSpace(fullName)) return string.Empty;
+
+            // Trim và Split loại bỏ các khoảng trắng thừa ở giữa
+            string[] parts = fullName.Trim().Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+
+            if (parts.Length > 0)
+                return parts[parts.Length - 1]; // Lấy từ cuối cùng
+
+            return fullName;
+        }
+        // hàm phụ trợ so sánh tên theo nước mình (logic nc ngoài là so sánh trái sang phải)
         static void SortCustomersByName()
         {
             if (customers.Count == 0)
@@ -722,8 +789,25 @@ namespace CinemaTicket
                 return;
             }
 
+            // Khởi tạo bộ so sánh tiếng Việt
+            CultureInfo viVn = new CultureInfo("vi-VN");
+
             customers.Sort((a, b) =>
-                string.Compare(a.Name, b.Name, StringComparison.OrdinalIgnoreCase));
+            {
+                string nameA = GetFirstName(a.Name);
+                string nameB = GetFirstName(b.Name);
+
+                // 1. So sánh Tên trước theo chuẩn tiếng Việt
+                int result = string.Compare(nameA, nameB, true, viVn);
+
+                // 2. Nếu tên trùng, so sánh cả Họ Tên đầy đủ
+                if (result == 0)
+                {
+                    return string.Compare(a.Name, b.Name, true, viVn);
+                }
+
+                return result;
+            });
 
             Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine("\n>> Danh sách khách sau khi sắp xếp theo tên (A → Z):\n");
@@ -731,7 +815,9 @@ namespace CinemaTicket
 
             foreach (var c in customers)
             {
-                Console.WriteLine($"- {c.Name,-20} | {c.PhoneLast4} | H{c.Row}, C{c.Col} | {c.Price} VND");
+                string rowLetter = GetRowLetter(c.Row - 1);
+                string seatCode = $"{rowLetter}{c.Col}";
+                Console.WriteLine($"- {c.Name,-25} | {c.PhoneLast4} | Ghế: {seatCode,-4} | {c.Price:N0} VND");
             }
 
             WaitAndClear();
